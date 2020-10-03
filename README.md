@@ -689,7 +689,8 @@ FUSE, which mergerfs uses, offers a number of page caching modes. mergerfs tries
 
 Due to mergerfs using FUSE and therefore being a userland process proxying existing filesystems the kernel will double cache the content being read and written through mergerfs. Once from the underlying filesystem and once from mergerfs (it sees them as two separate entities). Using `cache.files=off` will keep the double caching from happening by disabling caching of mergerfs but this has the side effect that *all* read and write calls will be passed to mergerfs which may be slower than enabling caching, you lose shared `mmap` support which can affect apps such as rtorrent, and no read-ahead will take place. The kernel will still cache the underlying filesystem data but that only helps so much given mergerfs will still process all requests.
 
-If you do enable file page caching, `cache.files=partial|full|auto-full`, you should also enable `dropcacheonclose` which will cause mergerfs to instruct the kernel to flush the underlying file's page cache when the file is closed. This behavior is the same as the rsync fadvise / drop cache patch and Feh's nocache project.
+If you do enable file page caching, `cache.files=partial|full|auto-full`, you should also enable `dropcacheonclose` which will cause mergerfs to instruct the kernel to flush the underlying file's page cache when the file is closed. This behavior is the same as the 
+fadvise / drop cache patch and Feh's nocache project.
 
 If most files are read once through and closed (like media) it is best to enable `dropcacheonclose` regardless of caching mode in order to minimize buffer bloat.
 
@@ -805,7 +806,7 @@ do
                   head -n 1 | \
                   cut -d' ' -f2-)
     test -n "${FILE}"
-    rsync -axqHAXWES --preallocate --remove-source-files "${CACHE}/./${FILE}" "${BACKING}/"
+    rsync -axqHAXWESR --preallocate --remove-source-files "${CACHE}/./${FILE}" "${BACKING}/"
 done
 ```
 
